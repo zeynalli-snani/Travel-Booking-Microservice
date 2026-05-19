@@ -1,48 +1,65 @@
-# Travel Booking Microservices
+# Welcome to Lets Put This Together
 
-This project is a small Spring Boot microservices system for travel booking. It uses:
+***
 
-- Netflix Eureka for service discovery
-- Netflix Zuul as the API gateway
-- Separate microservices for flights, hotels, and car rentals
-- External mock/public data sources for travel search results
+## Task
+The challenge of this project was to build a distributed Travel Booking System using a microservice architecture. The main technical hurdles included:
 
-## Services
+Service Discovery: Ensuring multiple independent services (Flights, Hotels, Cars) can find and communicate with each other dynamically.
 
-- `discovery-service` on `http://localhost:8761`
-- `api-gateway` on `http://localhost:8080`
-- `flight-service` on `http://localhost:8081`
-- `hotel-service` on `http://localhost:8082`
-- `car-rental-service` on `http://localhost:8083`
+Centralized Routing: Implementing a single entry point (API Gateway) to manage external requests and route them to the correct internal service.
 
-## Run Order
+External Integration: Transitioning from static local data to real-world integration by consuming external APIs using RestTemplate.
 
-Start the services in this order:
+Legacy Compatibility: Overcoming versioning conflicts between modern Spring Boot and the required Netflix Zuul/Eureka stack.
 
-1. `discovery-service`
-2. `flight-service`
-3. `hotel-service`
-4. `car-rental-service`
-5. `api-gateway`
+## Description
+The problem was solved by implementing a five-component system using Java 11 and Spring Cloud:
 
-After all services start, wait a few seconds for Eureka registration to finish.
+Discovery Service: Built with Netflix Eureka Server to act as the registry for all microservices.
 
-## Example Gateway Endpoints
+API Gateway: Built with Netflix Zuul to provide a unified URL structure and load balancing.
 
-These URLs work through Zuul on port `8080`:
+Microservices: Three dedicated services (Flight, Hotel, and Car Rental) that use Spring Data JPA and H2 In-Memory Databases.
 
-- Flights: [http://localhost:8080/flights/search?origin=NYC&destination=LAX](http://localhost:8080/flights/search?origin=NYC&destination=LAX)
-- Hotels: [http://localhost:8080/hotels/search?location=LosAngeles](http://localhost:8080/hotels/search?location=LosAngeles)
-- Cars: [http://localhost:8080/cars/search?location=LosAngeles](http://localhost:8080/cars/search?location=LosAngeles)
+Integration: Each service utilizes RestTemplate to fetch and normalize travel data from external mock/public datasets, satisfying the requirements for 3rd-party API integration.
 
-## Direct Service Endpoints
+## Installation
+This project uses Maven for dependency management.
 
-- Flights: [http://localhost:8081/flights/search?origin=NYC&destination=LAX](http://localhost:8081/flights/search?origin=NYC&destination=LAX)
-- Hotels: [http://localhost:8082/hotels/search?location=LosAngeles](http://localhost:8082/hotels/search?location=LosAngeles)
-- Cars: [http://localhost:8083/cars/search?location=LosAngeles](http://localhost:8083/cars/search?location=LosAngeles)
+Clone the repository.
 
-## Notes
+Verify Java Version: Ensure you are using Java 11 (required for Zuul compatibility).
 
-- `NYC` is normalized to `JFK` inside the flight service so the flight example returns matching results.
-- Hotel and car services consume external mock/public datasets and normalize plain-text JSON responses before mapping them.
-- The gateway timeout is increased so flight lookups have enough time to finish through Zuul.
+Build the project:
+From the root directory, run:
+```
+mvn clean install
+```
+## Usage
+To run the system, start the services in the following order to ensure proper registration:
+
+1. Run DiscoveryServiceApplication (Port 8761)
+
+2. Run FlightServiceApplication (Port 8081)
+
+3. Run HotelServiceApplication (Port 8082)
+
+4. Run CarRentalServiceApplication (Port 8083)
+ 
+5. Run ApiGatewayApplication (Port 8080)
+
+### Example API Calls (via Gateway)
+Once started, you can access all services through the Gateway (Port 8080):
+
+curl "http://localhost:8080/flights/search?origin=NYC&destination=LAX"
+
+curl "http://localhost:8080/hotels/search?location=LosAngeles"
+
+curl "http://localhost:8080/cars/search?location=LosAngeles"
+
+### The Core Team
+[zeynalli_s]
+
+Made at Qwasar SV -- Software Engineering School
+<img alt='Qwasar SV -- Software Engineering School's Logo' src='https://storage.googleapis.com/qwasar-public/qwasar-logo_50x50.png' width='20px' />
