@@ -13,3 +13,9 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+external:
+  api:
+    routes-url: https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat
+    airlines-url: https://raw.githubusercontent.com/jpatokal/openflights/master/data/airlines.dat
+    max-results: 10
