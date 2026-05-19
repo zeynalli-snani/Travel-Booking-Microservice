@@ -33,8 +33,8 @@ public class FlightService {
     }
 
     public List<Flight> searchFlights(String origin, String destination) {
-        String normalizedOrigin = origin.trim().toUpperCase(Locale.ROOT);
-        String normalizedDestination = destination.trim().toUpperCase(Locale.ROOT);
+        String normalizedOrigin = normalizeAirportCode(origin);
+        String normalizedDestination = normalizeAirportCode(destination);
 
         String routesCsv = restTemplate.getForObject(routesUrl, String.class);
         String airlinesCsv = restTemplate.getForObject(airlinesUrl, String.class);
@@ -112,5 +112,16 @@ public class FlightService {
 
     private String clean(String value) {
         return value.replace("\"", "").replace("\\N", "").trim();
+    }
+
+    private String normalizeAirportCode(String value) {
+        String normalized = value == null ? "" : value.trim().toUpperCase(Locale.ROOT);
+        if ("NYC".equals(normalized)) {
+            return "JFK";
+        }
+        if ("LA".equals(normalized)) {
+            return "LAX";
+        }
+        return normalized;
     }
 }
