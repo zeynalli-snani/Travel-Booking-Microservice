@@ -12,3 +12,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+external:
+  api:
+    hotels-url: https://raw.githubusercontent.com/Lemoncode/simple-hotels-mock-rest-api/master/mock-data/hotels-data.json
+    max-results: 10

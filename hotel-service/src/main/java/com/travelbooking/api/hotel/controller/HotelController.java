@@ -2,19 +2,25 @@ package com.travelbooking.api.hotel.controller;
 
 
 import com.travelbooking.api.hotel.model.Hotel;
-import org.springframework.web.bind.annotation.*;
-import java.util.Arrays;
+import com.travelbooking.api.hotel.service.HotelService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/hotels")
 public class HotelController {
+    private final HotelService hotelService;
+
+    public HotelController(HotelService hotelService) {
+        this.hotelService = hotelService;
+    }
 
     @GetMapping("/search")
     public List<Hotel> searchHotels(@RequestParam String location) {
-        return Arrays.asList(
-                new Hotel(1L, "Grand Plaza", location, 150.0, 4.5),
-                new Hotel(2L, "Seaside Resort", location, 200.0, 4.8)
-        );
+        return hotelService.searchHotels(location);
     }
 }
