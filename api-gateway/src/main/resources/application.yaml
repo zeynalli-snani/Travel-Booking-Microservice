@@ -10,8 +10,21 @@ spring:
 
 eureka:
   client:
+    registry-fetch-interval-seconds: 5
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+ribbon:
+  ConnectTimeout: 5000
+  ReadTimeout: 15000
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 20000
 
 zuul:
   set-content-wrapper: true
@@ -28,4 +41,3 @@ zuul:
       path: /cars/**
       serviceId: car-rental-service
       strip-prefix: false
-
