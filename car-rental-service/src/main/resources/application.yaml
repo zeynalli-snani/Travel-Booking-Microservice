@@ -11,3 +11,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+external:
+  api:
+    cars-url: https://raw.githubusercontent.com/vega/vega-datasets/master/data/cars.json
+    max-results: 10
