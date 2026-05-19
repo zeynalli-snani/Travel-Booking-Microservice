@@ -1,11 +1,14 @@
 package com.travelbooking.api.car.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.travelbooking.api.car.model.Car;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -14,29 +17,32 @@ import java.util.stream.Collectors;
 @Service
 public class CarRentalService {
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     private final String carsUrl;
     private final int maxResults;
 
     public CarRentalService(
             RestTemplate restTemplate,
+            ObjectMapper objectMapper,
             @Value("${external.api.cars-url}") String carsUrl,
             @Value("${external.api.max-results:10}") int maxResults
     ) {
         this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
         this.carsUrl = carsUrl;
         this.maxResults = maxResults;
     }
 
     public List<Car> searchCars(String location) {
-        CarApiResponse response = restTemplate.getForObject(carsUrl, CarApiResponse.class);
-        if (response == null || response.getValue() == null) {
+        List<ExternalCar> cars = fetchCars();
+        if (cars.isEmpty()) {
             return Collections.emptyList();
         }
 
-        String normalizedLocation = location.trim().toLowerCase(Locale.ROOT);
+        String normalizedLocation = normalizeLocation(location);
         String originPreference = determineOriginPreference(normalizedLocation);
 
-        return response.getValue().stream()
+        return cars.stream()
                 .filter(car -> originPreference == null || originPreference.equalsIgnoreCase(car.getOrigin()))
                 .limit(maxResults)
                 .map(this::mapCar)
@@ -53,8 +59,22 @@ public class CarRentalService {
         return car;
     }
 
+    private List<ExternalCar> fetchCars() {
+        String responseBody = restTemplate.getForObject(carsUrl, String.class);
+        if (responseBody == null || responseBody.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        try {
+            return objectMapper.readValue(responseBody, new TypeReference<List<ExternalCar>>() {
+            });
+        } catch (IOException exception) {
+            throw new IllegalStateException("Failed to parse car API response", exception);
+        }
+    }
+
     private String determineOriginPreference(String location) {
-        if (location.contains("usa") || location.contains("america") || location.contains("new york")) {
+        if (location.contains("usa") || location.contains("america") || location.contains("newyork") || location.contains("losangeles")) {
             return "USA";
         }
         if (location.contains("europe") || location.contains("paris") || location.contains("berlin")) {
@@ -64,6 +84,10 @@ public class CarRentalService {
             return "Japan";
         }
         return null;
+    }
+
+    private String normalizeLocation(String location) {
+        return location == null ? "" : location.replaceAll("[^a-zA-Z]", "").toLowerCase(Locale.ROOT);
     }
 
     private String determineType(Integer cylinders, Double milesPerGallon) {
@@ -103,18 +127,6 @@ public class CarRentalService {
                     .append(word.substring(1).toLowerCase(Locale.ROOT));
         }
         return builder.toString();
-    }
-
-    public static class CarApiResponse {
-        private List<ExternalCar> value;
-
-        public List<ExternalCar> getValue() {
-            return value;
-        }
-
-        public void setValue(List<ExternalCar> value) {
-            this.value = value;
-        }
     }
 
     public static class ExternalCar {
