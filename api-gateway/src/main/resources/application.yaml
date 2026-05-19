@@ -1,5 +1,8 @@
 server:
   port: 8080
+  error:
+    path: /error
+
 
 spring:
   application:
@@ -11,13 +14,18 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 
 zuul:
+  set-content-wrapper: true
   routes:
     flights:
       path: /flights/**
       serviceId: flight-service
+      strip-prefix: false
     hotels:
       path: /hotels/**
       serviceId: hotel-service
+      strip-prefix: false
     cars:
       path: /cars/**
       serviceId: car-rental-service
+      strip-prefix: false
+
