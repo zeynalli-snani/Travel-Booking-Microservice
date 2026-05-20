@@ -9,6 +9,8 @@ pipeline {
 
     environment {
         DOCKER_USER = 'iamnotsnani'
+
+        DOCKER_HOST = 'tcp://host.docker.internal:2375'
     }
 
     stages {
