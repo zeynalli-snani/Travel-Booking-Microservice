@@ -1,0 +1,42 @@
+
+services:
+  discovery-service:
+    build: ./discovery-service
+    ports:
+      - "8761:8761"
+
+  flight-service:
+    build: ./flight-service
+    ports:
+      - "8081:8081"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
+
+  hotel-service:
+    build: ./hotel-service
+    ports:
+      - "8082:8082"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
+
+  car-rental-service:
+    build: ./car-rental-service
+    ports:
+      - "8083:8083"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
