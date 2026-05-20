@@ -1,16 +1,16 @@
 pipeline {
     agent any
 
+    tools {
+            maven 'maven'
+            jdk 'java11'
+        }
+
     environment {
         DOCKER_USER = 'iamnotsnani'
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
 
         stage('Maven Build & Test') {
             steps {
