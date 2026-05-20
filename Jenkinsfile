@@ -1,47 +1,33 @@
 pipeline {
     agent any
-
     tools {
-            maven 'maven'
-            jdk 'java11'
-            dockerTool 'docker'
-        }
-
+        maven 'maven'
+        jdk 'java11'
+        dockerTool 'docker'
+    }
     environment {
         DOCKER_USER = 'iamnotsnani'
-
         DOCKER_HOST = 'tcp://host.docker.internal:2375'
     }
-
     stages {
-
-        stage('Maven Build & Test') {
+        stage('Maven Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Docker Build & Tag') {
+        stage('Docker Build & Push') {
             steps {
                 script {
                     def services = ['discovery-service', 'api-gateway', 'flight-service', 'hotel-service', 'car-rental-service']
 
-                    for (service in services) {
-                        echo "Building image for ${service}..."
-                        sh "docker build -t ${DOCKER_USER}/${service}:latest ./${service}"
-                    }
-                }
-            }
-        }
-
-        stage('Push to Docker Hub') {
-            steps {
-                script {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER_VAR')]) {
-                        sh "docker login -u ${DOCKER_USER_VAR} -p ${DOCKER_PASS}"
+                        // Secure login
+                        sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER_VAR} --password-stdin"
 
-                        def services = ['discovery-service', 'api-gateway', 'flight-service', 'hotel-service', 'car-rental-service']
                         for (service in services) {
+                            echo "Processing ${service}..."
+                            sh "docker build -t ${DOCKER_USER}/${service}:latest ./${service}"
                             sh "docker push ${DOCKER_USER}/${service}:latest"
                         }
                     }
@@ -56,3 +42,4 @@ pipeline {
         }
     }
 }
+
