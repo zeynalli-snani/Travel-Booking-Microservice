@@ -10,9 +10,15 @@ pipeline {
         DOCKER_HOST = 'tcp://host.docker.internal:2375'
     }
     stages {
-        stage('Maven Build') {
+        stage('Quality Gate') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh 'mvn clean verify'
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                    archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/site/jacoco/jacoco.xml, **/target/site/jacoco/index.html'
+                }
             }
         }
 
