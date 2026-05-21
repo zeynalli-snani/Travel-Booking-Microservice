@@ -17,6 +17,7 @@ pipeline {
             post {
                 always {
                     junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                    jacoco()
                     archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/site/jacoco/jacoco.xml, **/target/site/jacoco/index.html'
                 }
             }
