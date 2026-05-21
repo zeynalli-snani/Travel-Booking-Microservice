@@ -1,13 +1,22 @@
 package com.travelbooking.api.discovery;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
-@SpringBootTest
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class DiscoveryServiceApplicationTests {
 
     @Test
-    void contextLoads() {
+    void discoveryServiceApplicationHasRequiredAnnotations() {
+        assertTrue(DiscoveryServiceApplication.class.isAnnotationPresent(SpringBootApplication.class));
+        assertTrue(DiscoveryServiceApplication.class.isAnnotationPresent(EnableEurekaServer.class));
     }
 
+    @Test
+    void discoveryServiceApplicationClassLoads() {
+        assertNotNull(new DiscoveryServiceApplication());
+    }
 }
