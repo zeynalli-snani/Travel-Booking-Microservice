@@ -223,6 +223,7 @@ The application is also configured to be deployed to AWS on a single EC2 instanc
 - Public entry point: API Gateway on port `8080`
 - Internal orchestration: Docker Compose
 - Stable access: Elastic IP assigned to the EC2 instance
+- Public server IP: `3.71.152.215`
 
 ### Jenkins To AWS Deployment Flow
 1. Jenkins runs tests and coverage checks
@@ -251,6 +252,23 @@ sudo docker compose pull
 sudo docker compose up -d
 sudo docker ps
 sudo docker compose logs -f
+```
+
+### Public AWS Test Endpoints
+The deployed application can be tested directly through the public API Gateway on AWS:
+
+```bash
+http://3.71.152.215:8080/flights/search?origin=NYC&destination=LA
+http://3.71.152.215:8080/hotels/search?location=Seattle
+http://3.71.152.215:8080/cars/search?location=Tokyo
+```
+
+Example `curl` commands:
+
+```bash
+curl "http://3.71.152.215:8080/flights/search?origin=NYC&destination=LA"
+curl "http://3.71.152.215:8080/hotels/search?location=Seattle"
+curl "http://3.71.152.215:8080/cars/search?location=Tokyo"
 ```
 
 ## Testing And Coverage
